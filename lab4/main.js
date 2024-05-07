@@ -47,9 +47,9 @@ var map = L.map("map-canvas", {
 
 // 2. aerial photo * not working at this moment (see Assignment)
 //    - can be switched on/off by toggle thru L.control.layers (see below in this script)
-var wms_aerial_url = "https://geodata1.nationaalgeoregister.nl/luchtfoto/wms?";
+var wms_aerial_url = " 	https://service.pdok.nl/hwh/luchtfotorgb/wms/v1_0?";
 var basemap_aerial = new L.tileLayer.wms(wms_aerial_url, {
-  layers: ["luchtfoto_png"],
+  layers: ["Actueel_orthoHR"],
   styles: "",
   format: "image/png",
   transparent: true,
@@ -71,8 +71,39 @@ var sound = new L.tileLayer.wms(wms_sound_url, {
   pointerCursor: true,
 });
 
+// parcel from lab 3
+var parcel_url = "http://localhost:8080/geoserver/Manden/wms?";
+var parcel = new L.tileLayer.wms(parcel_url, {
+	layers: ["Manden:parcels"],
+	styles: "",
+	format: "image/png",
+	transparent: true, 
+	pointerCursor: true,
+});
+
+// top10nl layers
+var top10nl_url = "http://localhost:8080/geoserver/Manden/wms?";
+var top10nl = new L.tileLayer.wms(top10nl_url, {
+	layers: ["Manden:GEBOUW_VLAK", "Manden:WATERDEEL_VLAK"],
+	styles: ["gebouw_vlak", "waterdeel_vlak"],
+	format: "image/png",
+	transparent: true,
+	pointerCursor: true,
+});
+
+var ambient_url = "https://service.pdok.nl/rvo/omgevingswarmte/wms/v1_0?";
+var ambient = new L.tileLayer.wms(ambient_url, {
+  layers: "warmteopenwkogem",
+  styles: "",
+  format: "image/png",
+  transparent: true,
+  pointerCursor: true,
+});
+
 var overlays = {
   "Road noise [WMS]": sound,
+  "parcels [WMS]": parcel,
+  "top10_nl [WMS]": top10nl,
 };
 
 var baseLayers = {
@@ -81,6 +112,7 @@ var baseLayers = {
   "BRT-Achtergrondkaart Pastel [WMTS]": brtPastel,
   "BRT-Achtergrondkaart Water [WMTS]": brtWater,
   "Aerial photo [WMS]": basemap_aerial,
+  "ambient heat [WMS]": ambient,
 };
 
 L.control.layers(baseLayers, overlays).addTo(map);

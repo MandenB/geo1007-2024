@@ -2,6 +2,9 @@ var allFunctions = function () {
   "use strict";
 
   console.log("entering all functions");
+
+  var mapDiv = document.querySelector("main .mapDiv");
+
   var createTableFromJsonResponse = function (data) {
     document.querySelector("main .forDebug").append(JSON.stringify(data));
 
@@ -97,6 +100,12 @@ var allFunctions = function () {
 
   //   "use strict";
   var anotherGeonamesRequest = function (latitude, longitude) {
+	// delete existing xml text
+	var existingXmlData = document.querySelector("main .forDebug2 textarea");
+	if (existingXmlData) {
+    existingXmlData.parentNode.removeChild(existingXmlData);
+	}
+	  
     var baseUrl =
       "http://api.geonames.org/findNearestIntersectionOSM?username=bktudelft";
     var params = "&lat=" + latitude + "&lng=" + longitude;
@@ -126,35 +135,55 @@ var allFunctions = function () {
     request.send();
   };
 
-  var handleXMLResponse = function (data) {
-    var feature = data.getElementsByTagName("intersection")[0];
-    if (typeof feature !== "undefined" && feature.childNodes.length > 0) {
-      var headerRow = document.createElement("tr");
-      headerRow.innerHTML = "<th>Property name</th><th>value</th>";
-      document.querySelector("#xmlDataAsTable").append(headerRow);
-      for (var i = 0; i < feature.childNodes.length; i++) {
-        if (feature.childNodes[i].nodeName != "#text") {
-          var row = document.createElement("tr");
-          row.style.display = "none";
-          row.innerHTML =
-            "<td>" +
-            feature.childNodes[i].nodeName +
-            "</td>" +
-            "<td>" +
-            feature.childNodes[i].childNodes[0].nodeValue +
-            "</td>";
-          document.querySelector("#xmlDataAsTable").append(row);
-          row.style.display = "table-row";
-        }
-      }
-    } else {
-      document
-        .querySelector("main .messages2")
-        .append("no 'intersection' in XML response");
-    }
-  };
+	var handleXMLResponse = function (data) {
+	  // Remove any existing table
+	  var existingTable = document.querySelector("#xmlDataAsTable");
+	  if (existingTable) {
+		existingTable.parentNode.removeChild(existingTable);
+	  }
+
+	  var feature = data.getElementsByTagName("intersection")[0];
+	  if (typeof feature !== "undefined" && feature.childNodes.length > 0) {
+		var newTable = document.createElement("table");
+		newTable.id = "xmlDataAsTable";
+
+		var headerRow = document.createElement("tr");
+		headerRow.innerHTML = "<th>Property name</th><th>value</th>";
+		newTable.appendChild(headerRow);
+
+		for (var i = 0; i < feature.childNodes.length; i++) {
+		  if (feature.childNodes[i].nodeName != "#text") {
+			var row = document.createElement("tr");
+			row.style.display = "none";
+			row.innerHTML =
+			  "<td>" +
+			  feature.childNodes[i].nodeName +
+			  "</td>" +
+			  "<td>" +
+			  feature.childNodes[i].childNodes[0].nodeValue +
+			  "</td>";
+			newTable.appendChild(row);
+			row.style.display = "table-row";
+		  }
+		}
+
+		// Append the new table to the main element
+		document.querySelector("main").appendChild(newTable);
+	  } else {
+		document
+		  .querySelector("main .messages2")
+		  .append("no 'intersection' in XML response");
+	  }
+	};
+
 
   var getAndDisplayMap = function (wms_request) {
+    // Remove existing map
+    var existingMap = document.querySelector(".mapDiv img");
+    if (existingMap) {
+      existingMap.parentNode.removeChild(existingMap);
+    }
+    
     var img = document.createElement("img");
     img.style.display = "none";
     img.src = wms_request;
